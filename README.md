@@ -88,11 +88,12 @@ src/
 Two rules worth keeping:
 
 1. **Fetch data in page frontmatter through `src/lib/api.ts`**, never from a
-   `<script>` in the browser — only the server may call the API.
+   `<script>` in the browser — this template keeps every API call on the
+   server.
 2. Don't use `Astro.session` or on-demand image resizing: the platform gives
    your Worker neither a session store nor an image service.
 
 ## Getting help
 
-Broke something? Every deploy is kept, so you can redeploy an earlier one from
-your dashboard while you fix it.
+Broke something? Your recent deploys are kept, so you can redeploy an earlier one
+from your dashboard while you fix it.
