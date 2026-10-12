@@ -78,6 +78,10 @@ True for any code on an EzyCommunity Site, not only this Template:
 - **Site API and Site Database** (optional; this Template uses neither): one
   Hono app at `/site-api/*`, mounted by `src/pages/site-api/[...path].ts`
   (`ALL`, `prerender = false`), on Prisma 7 Postgres. The Astro app Template
-  (`AppifyLab/ezy-template-community-astro-app`) shows both.
+  (`AppifyLab/ezy-template-community-astro-app`) shows both. Server code
+  calls the Site API in-process (`hc<AppType>(url, {fetch: app.request})` or
+  `app.request(path)`); never `fetch()` the own hostname for `/site-api/…` or
+  a page: deployed, it reaches the App (a 404), not this Worker. Server
+  fetches of `/api/…` are fine.
 - **No deploy config.** Don't commit `wrangler.*`: the platform writes the
   Worker config and drops any KV, R2, D1 or other binding.
