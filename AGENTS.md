@@ -58,14 +58,26 @@ True for any code on an EzyCommunity Site, not only this Template:
   `/<product>/<id>/checkout` and more: a file or route there is never served
   (the dashboard lists it as a shadowed path). Link to App pages with a plain
   `<a href>`.
-- **Community data comes only from its public API on its own hostname**
-  (`/api/public/...`): server code builds the URL from `EZY_SITE_URL` (the
-  only environment variable), browser code uses relative URLs. Deployed server
-  code can reach no other host. Data fetched during the Build is frozen until
-  the next Build (a Redeploy reuses the old output) — fetch at request time or
-  in the browser.
-- **There are no secrets.** No secret store exists: never put keys, tokens or
-  passwords in code, `.env` or config — assume anything in the project can end
-  up public. Never send a member's email address to the browser.
+- **Community data comes from its own hostname.** The public API
+  (`/api/public/...`): server code builds the URL from `EZY_SITE_URL` (a plain
+  variable, not a secret), browser code uses relative URLs. Server code may
+  also read as the community, at member level, from `/api/site/v1/...` with
+  `Authorization: Bearer ${env.EZY_COMMUNITY_KEY}` — never emails or payment
+  data. Data fetched during the Build is frozen until the next Build (a
+  Redeploy reuses the old output) — fetch at request time or in the browser.
+- **Secrets are platform-provided only.** The platform sets `DATABASE_URL`
+  (the Site Database) and `EZY_COMMUNITY_KEY` as Worker secrets: read them
+  from `env` (`import {env} from 'cloudflare:workers'`) in server code only.
+  Never send them to the browser, log them, write them to a file (`.env`,
+  `.dev.vars`, config) or commit them. You cannot add secrets: never hardcode
+  a key, token or password, never ask the owner for one. Never send a
+  member's email address to the browser.
+- **Network.** Deployed server code reaches ONLY the community's own hostname
+  and its Site Database (`db.prisma.io`); every other host fails `403 Egress
+  blocked`. Raw TCP (`pg`, `postgres`, `node:net`) does not work at all.
+- **Site API and Site Database** (optional; this Template uses neither): one
+  Hono app at `/site-api/*`, mounted by `src/pages/site-api/[...path].ts`
+  (`ALL`, `prerender = false`), on Prisma 7 Postgres. The Astro app Template
+  (`AppifyLab/ezy-template-community-astro-app`) shows both.
 - **No deploy config.** Don't commit `wrangler.*`: the platform writes the
   Worker config and drops any KV, R2, D1 or other binding.
